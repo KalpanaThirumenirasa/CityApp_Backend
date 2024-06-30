@@ -1,4 +1,6 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
+import type { NextApiRequest, NextApiResponse } from 'next';
+import { getHotelById, updateHotel, deleteHotel } from '@/src/utils/hotel';
+import corsMiddleware from '../../../middleware/cors';
 
 type User = {
   id: number
@@ -43,3 +45,5 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
       res.status(405).end(`Method ${method} Not Allowed`)
   }
 }
+
+

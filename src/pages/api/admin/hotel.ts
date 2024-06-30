@@ -1,16 +1,18 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { addHotel } from '@/src/utils/auth';
+import { addHotel, getHotels } from  '../../../utils/hotel';
 import corsMiddleware from '../../../middleware/cors';
 
-async function handler(req: NextApiRequest, res: NextApiResponse) {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   await corsMiddleware(req, res, () => {});
 
-  if (req.method === 'POST') {
+  if (req.method === 'GET') {
+    return getHotels(req, res);
+  } else if (req.method === 'POST') {
     return addHotel(req, res);
   } else {
-    res.setHeader('Allow', ['POST']);
+    res.setHeader('Allow', ['GET', 'POST']);
     res.status(405).end(`Method ${req.method} Not Allowed`);
   }
-}
+};
 
 export default handler;
