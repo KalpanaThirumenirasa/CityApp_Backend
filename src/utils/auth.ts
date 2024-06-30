@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import jwt from 'jsonwebtoken';
 import bcrypt from 'bcryptjs';
 import clientPromise from './db';
-import { User, UserRole } from './authTypes';
+import { Hotel, User, UserRole } from './authTypes';
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
@@ -56,11 +56,45 @@ export const registerUser = async (req: NextApiRequest, res: NextApiResponse) =>
     res.status(500).json({ message: 'Internal server error', error: error });
   }
 };
+export const addHotel = async (req: NextApiRequest, res: NextApiResponse) => {
+  const { hotelName, desc, address,image } = req.body;
 
+  if (!hotelName || !desc || !address || !image) {
+    res.status(400).json({ message: 'hotelname, description, address and image are required' });
+    return;
+  }
+
+  try {
+    console.log('Connecting to database...');
+    const client = await clientPromise;
+    console.log('Connected to database');
+    
+    const db = client.db('city_new');
+    const usersCollection = db.collection<Hotel>('hotels');
+
+    console.log('Adding hotel data');
+    
+    const newHotel: Hotel = { 
+      hotelName, 
+      desc, 
+      address, 
+      image 
+    };
+
+    console.log('Inserting new hotel data...');
+    await usersCollection.insertOne(newHotel);
+    console.log('New hotel data inserted');
+
+    res.status(201).json({ message: 'Hotel data added successfully' });
+  } catch (error) {
+    console.error('Error adding data:', error);
+    res.status(500).json({ message: 'Internal server error', error: error });
+  }
+};
 
 export const loginUser = async (req: NextApiRequest, res: NextApiResponse) => {
   const { username, password } = req.body;
-
+  console.log(username, password);
   if (!username || !password) {
     res.status(400).json({ message: 'Username and password are required' });
     return;
@@ -70,21 +104,22 @@ export const loginUser = async (req: NextApiRequest, res: NextApiResponse) => {
     const client = await clientPromise;
     const db = client.db('city_new');
     const usersCollection = db.collection<User>('users');
-
+    
     const user = await usersCollection.findOne({ username });
+    console.log(user);
     if (!user) {
       res.status(400).json({ message: 'Invalid credentials' });
       return;
     }
 
     const isPasswordValid = await bcrypt.compare(password, user.password);
+    console.log(isPasswordValid);
     if (!isPasswordValid) {
       res.status(400).json({ message: 'Invalid credentials' });
       return;
     }
 
     const token = jwt.sign({ userId: user._id }, JWT_SECRET, { expiresIn: '1h' });
-
     res.status(200).json({ token });
   } catch (error) {
     res.status(500).json({ message: 'Internal server error' });
