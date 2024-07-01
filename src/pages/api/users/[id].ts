@@ -1,6 +1,4 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { getHotelById, updateHotel, deleteHotel } from '@/src/utils/hotel';
-import corsMiddleware from '../../../middleware/cors';
 
 type User = {
   id: number

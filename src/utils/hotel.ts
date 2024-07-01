@@ -87,10 +87,11 @@ export const getHotelById = async (req: NextApiRequest, res: NextApiResponse) =>
 
 // Update a hotel by ID
 export const updateHotel = async (req: NextApiRequest, res: NextApiResponse) => {
+
   const { id } = req.query;
   const { hotelName, desc, address, image } = req.body;
-
   if (!id) {
+
     res.status(400).json({ message: 'Hotel ID is required' });
     return;
   }
