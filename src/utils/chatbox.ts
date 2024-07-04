@@ -72,7 +72,7 @@ export const AdminAddChatbox = async (
     await chatboxCollection.insertOne(newChatbox);
     console.log("New Chatbox message inserted");
 
-    res.status(201).json({ message: "Chatbox message added successfully" });
+    res.status(201).json(newChatbox );
   } catch (error) {
     console.error("Error adding message:", error);
     res.status(500).json({ message: "Internal server error", error });
@@ -127,7 +127,8 @@ export const getChatboxById = async (
     console.log("Fetching Chatbox message by ID...");
     const query = { userId: String(userId) }; 
 
-    const chatboxes = await chatboxCollection.find(query).toArray();
+    // const chatboxes = await chatboxCollection.find(query).toArray();
+    const chatboxes = await chatboxCollection.find({}).toArray();
     
 
     res.status(200).json(chatboxes);

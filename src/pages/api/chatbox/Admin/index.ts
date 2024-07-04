@@ -2,8 +2,6 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import corsMiddleware from "../../../../middleware/cors";
 import {
   getChatboxes,
-  getChatboxById,
-  UserAddChatbox,
   AdminAddChatbox,
 } from "@/src/utils/chatbox";
 
@@ -12,6 +10,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === "GET") {
       return getChatboxes(req, res);
     } else if (req.method === "POST") {
+      console.log(req)
       return AdminAddChatbox(req, res);
     } else {
       res.setHeader("Allow", ["GET", "POST"]);
