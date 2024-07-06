@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from './db';
 import { ObjectId } from 'mongodb';
+import { getLogger } from "../lib/logger";
+
+const logger= getLogger();
 
 // Add a new Restaurant
 export const addRestaurant = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -12,19 +15,19 @@ export const addRestaurant = async (req: NextApiRequest, res: NextApiResponse) =
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const RestaurantsCollection = db.collection('restaurants');
 
-    console.log('Adding Restaurant data');
+    logger.info('Adding Restaurant data');
     const newRestaurant = { restaurantName, desc, address, image };
 
-    console.log('Inserting new Restaurant data...');
+    logger.info('Inserting new Restaurant data...');
     await RestaurantsCollection.insertOne(newRestaurant);
-    console.log('New Restaurants data inserted');
+    logger.info('New Restaurants data inserted');
 
     res.status(201).json({ message: 'Restaurant data added successfully' });
   } catch (error) {
@@ -36,19 +39,19 @@ export const addRestaurant = async (req: NextApiRequest, res: NextApiResponse) =
 // Get all Restaurants
 export const getRestaurants = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const RestaurantsCollection = db.collection('restaurants');
 
-    console.log('Fetching all Restaurants...');
+    logger.info('Fetching all Restaurants...');
     const Restaurants = await RestaurantsCollection.find({}).toArray();
 
     res.status(200).json(Restaurants);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    logger.error('Error fetching data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -63,14 +66,14 @@ export const getRestaurantById = async (req: NextApiRequest, res: NextApiRespons
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const restaurantsCollection = db.collection('restaurants');
 
-    console.log('Fetching Restaurant by ID...');
+    logger.info('Fetching Restaurant by ID...');
     const restaurant = await restaurantsCollection.findOne({ _id: new ObjectId(id as string) });
 
     if (!restaurant) {
@@ -80,7 +83,7 @@ export const getRestaurantById = async (req: NextApiRequest, res: NextApiRespons
 
     res.status(200).json(restaurant);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    logger.error('Error fetching data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -102,14 +105,14 @@ export const updateRestaurant = async (req: NextApiRequest, res: NextApiResponse
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const restaurantsCollection = db.collection('restaurants');
 
-    console.log('Updating Restaurant...');
+    logger.info('Updating Restaurant...');
     const updatedRestaurant = { restaurantName, desc, address, image };
     const result = await restaurantsCollection.updateOne({ _id: new ObjectId(id as string) }, { $set: updatedRestaurant });
 
@@ -120,7 +123,7 @@ export const updateRestaurant = async (req: NextApiRequest, res: NextApiResponse
 
     res.status(200).json({ message: 'Restaurant updated successfully' });
   } catch (error) {
-    console.error('Error updating data:', error);
+    logger.error('Error updating data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -135,14 +138,14 @@ export const deleteRestaurant = async (req: NextApiRequest, res: NextApiResponse
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const restaurantsCollection = db.collection('restaurants');
 
-    console.log('Deleting Restaurant...');
+    logger.info('Deleting Restaurant...');
     const result = await restaurantsCollection.deleteOne({ _id: new ObjectId(id as string) });
 
     if (result.deletedCount === 0) {
@@ -152,7 +155,7 @@ export const deleteRestaurant = async (req: NextApiRequest, res: NextApiResponse
 
     res.status(200).json({ message: 'Restaurant deleted successfully' });
   } catch (error) {
-    console.error('Error deleting data:', error);
+    logger.error('Error deleting data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };

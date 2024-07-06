@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from './db';
 import { ObjectId } from 'mongodb';
+import { getLogger } from "../lib/logger";
+
+const logger= getLogger();
 
 // Add a new Touristplace
 export const addTouristplace = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -12,23 +15,23 @@ export const addTouristplace = async (req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const touristplacesCollection = db.collection('touristplaces');
 
-    console.log('Adding Touristplace data');
+    logger.info('Adding Touristplace data');
     const newTouristplace = { touristplaceName, desc, address, image };
 
-    console.log('Inserting new Touristplace data...');
+    logger.info('Inserting new Touristplace data...');
     await touristplacesCollection.insertOne(newTouristplace);
-    console.log('NewTtouristplace data inserted');
+    logger.info('NewTtouristplace data inserted');
 
     res.status(201).json({ message: 'Touristplace data added successfully' });
   } catch (error) {
-    console.error('Error adding data:', error);
+    logger.error('Error adding data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -36,19 +39,19 @@ export const addTouristplace = async (req: NextApiRequest, res: NextApiResponse)
 // Get all Touristplaces
 export const getTouristplaces = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const touristplacesCollection = db.collection('touristplaces');
 
-    console.log('Fetching all Touristplaces...');
+    logger.info('Fetching all Touristplaces...');
     const touristplaces = await touristplacesCollection.find({}).toArray();
 
     res.status(200).json(touristplaces);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    logger.error('Error fetching data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -63,14 +66,14 @@ export const getTouristplaceById = async (req: NextApiRequest, res: NextApiRespo
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const touristplacesCollection = db.collection('touristplaces');
 
-    console.log('Fetching Touristplace by ID...');
+    logger.info('Fetching Touristplace by ID...');
     const touristplace = await touristplacesCollection.findOne({ _id: new ObjectId(id as string) });
 
     if (!touristplace) {
@@ -80,7 +83,7 @@ export const getTouristplaceById = async (req: NextApiRequest, res: NextApiRespo
 
     res.status(200).json(touristplace);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    logger.error('Error fetching data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -102,14 +105,14 @@ export const updateTouristplace = async (req: NextApiRequest, res: NextApiRespon
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const touristplacesCollection = db.collection('touristplaces');
 
-    console.log('Updating Touristplace...');
+    logger.info('Updating Touristplace...');
     const updatedTouristplace = { touristplaceName, desc, address, image };
     const result = await touristplacesCollection.updateOne({ _id: new ObjectId(id as string) }, { $set: updateTouristplace });
 
@@ -120,7 +123,7 @@ export const updateTouristplace = async (req: NextApiRequest, res: NextApiRespon
 
     res.status(200).json({ message: 'Touristplace updated successfully' });
   } catch (error) {
-    console.error('Error updating data:', error);
+    logger.error('Error updating data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -135,14 +138,14 @@ export const deleteTouristplace = async (req: NextApiRequest, res: NextApiRespon
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const touristplacesCollection = db.collection('touristplaces');
 
-    console.log('Deleting Touristplace...');
+    logger.info('Deleting Touristplace...');
     const result = await touristplacesCollection.deleteOne({ _id: new ObjectId(id as string) });
 
     if (result.deletedCount === 0) {
@@ -152,7 +155,7 @@ export const deleteTouristplace = async (req: NextApiRequest, res: NextApiRespon
 
     res.status(200).json({ message: 'Touristplace deleted successfully' });
   } catch (error) {
-    console.error('Error deleting data:', error);
+    logger.error('Error deleting data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };

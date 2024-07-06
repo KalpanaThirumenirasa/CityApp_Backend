@@ -2,7 +2,7 @@
 export interface User {
     _id?: string;
     firstname:string,
-    username: string;
+    email: string;
     password: string;
     role: UserRole; 
     

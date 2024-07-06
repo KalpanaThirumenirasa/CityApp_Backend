@@ -10,7 +10,6 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
     if (req.method === "GET") {
       return getChatboxes(req, res);
     } else if (req.method === "POST") {
-      console.log(req)
       return AdminAddChatbox(req, res);
     } else {
       res.setHeader("Allow", ["GET", "POST"]);

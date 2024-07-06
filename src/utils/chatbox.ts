@@ -1,7 +1,9 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import clientPromise from "./db";
 import { ObjectId } from "mongodb";
+import { getLogger } from "../lib/logger";
 
+const logger= getLogger();
 // Add a new Chatbox message
 export const UserAddChatbox = async (
   req: NextApiRequest,
@@ -15,14 +17,14 @@ export const UserAddChatbox = async (
   }
 
   try {
-    console.log("Connecting to database...");
+    logger.info("Connecting to database...");
     const client = await clientPromise;
-    console.log("Connected to database");
+    logger.info("Connected to database");
 
     const db = client.db("city_new");
     const chatboxCollection = db.collection("Chatbox");
 
-    console.log("Adding Chatbox message...");
+    logger.info("Adding Chatbox message...");
     const newChatbox = {
       userId,
       message,
@@ -30,13 +32,13 @@ export const UserAddChatbox = async (
       adminReply: "",
     };
 
-    console.log("Inserting new Chatbox message...");
+    logger.info("Inserting new Chatbox message...");
     await chatboxCollection.insertOne(newChatbox);
-    console.log("New Chatbox message inserted");
+    logger.info("New Chatbox message inserted");
 
     res.status(201).json(newChatbox );
   } catch (error) {
-    console.error("Error adding message:", error);
+    logger.error("Error adding message:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 };
@@ -53,14 +55,14 @@ export const AdminAddChatbox = async (
   }
 
   try {
-    console.log("Connecting to database...");
+    logger.info("Connecting to database...");
     const client = await clientPromise;
-    console.log("Connected to database");
+    logger.info("Connected to database");
 
     const db = client.db("city_new");
     const chatboxCollection = db.collection("Chatbox");
 
-    console.log("Adding Chatbox message...");
+    logger.info("Adding Chatbox message...");
     const newChatbox = {
       userId,
       message:"",
@@ -68,13 +70,13 @@ export const AdminAddChatbox = async (
       adminReply,
     };
 
-    console.log("Inserting new Chatbox message...");
+    logger.info("Inserting new Chatbox message...");
     await chatboxCollection.insertOne(newChatbox);
-    console.log("New Chatbox message inserted");
+    logger.info("New Chatbox message inserted");
 
     res.status(201).json(newChatbox );
   } catch (error) {
-    console.error("Error adding message:", error);
+    logger.error("Error adding message:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 };
@@ -85,19 +87,19 @@ export const getChatboxes = async (
   res: NextApiResponse
 ) => {
   try {
-    console.log("Connecting to database...");
+    logger.info("Connecting to database...");
     const client = await clientPromise;
-    console.log("Connected to database");
+    logger.info("Connected to database");
 
     const db = client.db("city_new");
     const chatboxCollection = db.collection("Chatbox");
 
-    console.log("Fetching all Chatbox messages...");
+    logger.info("Fetching all Chatbox messages...");
     const chatboxes = await chatboxCollection.find({}).toArray();
 
     res.status(200).json(chatboxes);
   } catch (error) {
-    console.error("Error fetching messages:", error);
+    logger.error("Error fetching messages:", error);
     res.status(500).json({ message: "Internal server error", error });
   }
 };
@@ -108,7 +110,7 @@ export const getChatboxById = async (
   res: NextApiResponse,
   userId: string
 ) => {
-  console.log("request is",userId);
+  logger.info("request is",userId);
   // const { userId  } = req.query;
 
   if (!userId ) {
@@ -117,14 +119,14 @@ export const getChatboxById = async (
   }
 
   try {
-    console.log("Connecting to database...");
+    logger.info("Connecting to database...");
     const client = await clientPromise;
-    console.log("Connected to database");
+    logger.info("Connected to database");
 
     const db = client.db("city_new");
     const chatboxCollection = db.collection("Chatbox");
 
-    console.log("Fetching Chatbox message by ID...");
+    logger.info("Fetching Chatbox message by ID...");
     const query = { userId: String(userId) }; 
 
     // const chatboxes = await chatboxCollection.find(query).toArray();

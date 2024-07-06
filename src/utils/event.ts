@@ -1,6 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import clientPromise from './db';
 import { ObjectId } from 'mongodb';
+import { getLogger } from "../lib/logger";
+
+const logger= getLogger();
 
 // Add a new Event
 export const addEvent = async (req: NextApiRequest, res: NextApiResponse) => {
@@ -12,23 +15,23 @@ export const addEvent = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const eventsCollection = db.collection('events');
 
-    console.log('Adding Event data');
+    logger.info('Adding Event data');
     const newEvent = { eventName, desc, address, image };
 
-    console.log('Inserting new Event data...');
+    logger.info('Inserting new Event data...');
     await eventsCollection.insertOne(newEvent);
-    console.log('New Event data inserted');
+    logger.info('New Event data inserted');
 
     res.status(201).json({ message: 'Event data added successfully' });
   } catch (error) {
-    console.error('Error adding data:', error);
+    logger.error('Error adding data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -36,19 +39,19 @@ export const addEvent = async (req: NextApiRequest, res: NextApiResponse) => {
 // Get all Events
 export const getEvents = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const eventsCollection = db.collection('events');
 
-    console.log('Fetching all Events...');
+    logger.info('Fetching all Events...');
     const Events = await eventsCollection.find({}).toArray();
 
     res.status(200).json(Events);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    logger.error('Error fetching data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -63,14 +66,14 @@ export const getEventById = async (req: NextApiRequest, res: NextApiResponse) =>
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const eventsCollection = db.collection('events');
 
-    console.log('Fetching Event by ID...');
+    logger.info('Fetching Event by ID...');
     const event = await eventsCollection.findOne({ _id: new ObjectId(id as string) });
 
     if (!event) {
@@ -80,7 +83,7 @@ export const getEventById = async (req: NextApiRequest, res: NextApiResponse) =>
 
     res.status(200).json(event);
   } catch (error) {
-    console.error('Error fetching data:', error);
+    logger.error('Error fetching data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -102,14 +105,14 @@ export const updateEvent = async (req: NextApiRequest, res: NextApiResponse) => 
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const eventsCollection = db.collection('events');
 
-    console.log('Updating Event...');
+    logger.info('Updating Event...');
     const updatedEvent = { eventName, desc, address, image };
     const result = await eventsCollection.updateOne({ _id: new ObjectId(id as string) }, { $set: updatedEvent });
 
@@ -120,7 +123,7 @@ export const updateEvent = async (req: NextApiRequest, res: NextApiResponse) => 
 
     res.status(200).json({ message: 'Event updated successfully' });
   } catch (error) {
-    console.error('Error updating data:', error);
+    logger.error('Error updating data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
@@ -135,14 +138,14 @@ export const deleteEvent = async (req: NextApiRequest, res: NextApiResponse) => 
   }
 
   try {
-    console.log('Connecting to database...');
+    logger.info('Connecting to database...');
     const client = await clientPromise;
-    console.log('Connected to database');
+    logger.info('Connected to database');
 
     const db = client.db('city_new');
     const eventsCollection = db.collection('events');
 
-    console.log('Deleting Event...');
+    logger.info('Deleting Event...');
     const result = await eventsCollection.deleteOne({ _id: new ObjectId(id as string) });
 
     if (result.deletedCount === 0) {
@@ -152,7 +155,7 @@ export const deleteEvent = async (req: NextApiRequest, res: NextApiResponse) => 
 
     res.status(200).json({ message: 'Event deleted successfully' });
   } catch (error) {
-    console.error('Error deleting data:', error);
+    logger.error('Error deleting data:', error);
     res.status(500).json({ message: 'Internal server error', error });
   }
 };
